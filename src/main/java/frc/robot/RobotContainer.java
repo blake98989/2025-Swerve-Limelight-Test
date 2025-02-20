@@ -57,6 +57,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController testManipulatorController = new CommandXboxController(1);
   
   // Adding subsystems into Container
   private final CoralSubsystem m_coralSubSystem = new CoralSubsystem();
@@ -148,14 +149,16 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to 0° when A button is held
-    controller
+    testManipulatorController
         .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+                () -> new Rotation2d())) //Input Specific angle in radians (pi/180)
+        .onTrue(
+            new CoralStationTrack(m_LimelightSubsystem));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -205,9 +208,6 @@ controller.rightBumper().whileTrue(m_coralSubSystem.reverseIntakeCommand());
         .leftTrigger(OIConstants.kTriggerButtonThreshold)
         .whileTrue(m_algaeSubsystem.reverseIntakeCommand());
 
-    controller
-        .y()
-        .onTrue(new CoralStationTrack(m_LimelightSubsystem));
         
   }
 
